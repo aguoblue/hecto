@@ -1,8 +1,7 @@
 use crossterm::event::{read, Event::Key, KeyCode::Char};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-pub struct Editor {
-}
+pub struct Editor {}
 
 impl Editor {
     pub fn default() -> Self {            
@@ -13,17 +12,14 @@ impl Editor {
         loop {
             match read() {
                 Ok(Key(event)) => {
-                    println!("{:?} \r", event);
-                    match event.code {
-                        Char(c) => {
-                            if c == 'q' {
-                                break;
-                            }
-                        },
-                        _ => (),   
-                    }   
+                    println!("{event:?} \r");
+                    if let Char(c) = event.code {
+                        if c == 'q' {
+                            break;
+                        }
+                    }
                 },
-                Err(err) => println!("Error: {}", err),
+                Err(err) => println!("Error: {err}"),
                 _ => ()
             }
         }
@@ -38,3 +34,7 @@ impl Editor {
 // 在main函数声明mod，改为使用整体逻辑
 
 // 更专注于crossterm
+
+// 使用 clippy 进行代码检测
+// 调整了格式化
+// 使用 if let 简化
