@@ -2,8 +2,12 @@
 mod editor;
 use editor::Editor;
 
+mod assignment;
+
 fn main() {
     Editor::default().run();
+    // assignment::tildes::test_tuple_and_loop();
+    // assignment::tildes::draw_row();
 }
 
 
