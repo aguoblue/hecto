@@ -1,31 +1,39 @@
 use core::panic;
-
-use crossterm::event::{read, Event::Key, KeyCode::Char};
+use crossterm::event::{read, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-pub struct Editor {}
+pub struct Editor {
+    should_quit: bool,
+}
 
 impl Editor {
     pub fn default() -> Self {            
-        Editor{}            
+        Editor{should_quit: false}            
     }
-    pub fn run(&self){
+    pub fn run(&mut self){
         if let Err(err) = self.repl() {
             panic!("{err:#?}");
         }
         print!("Goodbye.\r\n");
     }
 
-    fn repl(&self) -> Result<(), std::io::Error> {
+    fn repl(&mut self) -> Result<(), std::io::Error> {
         enable_raw_mode()?;
         loop {
-            if let Key(event) = read()? {
-                println!("{event:?} \r");
-                if let Char(c) = event.code {
-                    if c == 'q' {
-                        break;
+            if let Key(KeyEvent {
+                code, modifiers, kind, state
+            }) = read()?
+            {
+                println!("Code: {code:?} Modifiers: {modifiers:?} Kind: {kind:?} State: {state:?} \r");
+                match code {
+                    Char('c') if modifiers == KeyModifiers::CONTROL => {
+                        self.should_quit = true;
                     }
+                    _ => (),
                 }
+            }
+            if self.should_quit {
+                break;
             }
         }
         disable_raw_mode()?;
@@ -47,3 +55,7 @@ impl Editor {
 
 // 错误向上传递
 // 使用?传递
+
+// 使用 control + c 来控制退出
+// 增加一个标识
+// 可变mut self
