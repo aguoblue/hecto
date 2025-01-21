@@ -1,3 +1,5 @@
+use core::panic;
+
 use crossterm::event::{read, Event::Key, KeyCode::Char};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
@@ -8,22 +10,26 @@ impl Editor {
         Editor{}            
     }
     pub fn run(&self){
-        enable_raw_mode().unwrap();
+        if let Err(err) = self.repl() {
+            panic!("{err:#?}");
+        }
+        print!("Goodbye.\r\n");
+    }
+
+    fn repl(&self) -> Result<(), std::io::Error> {
+        enable_raw_mode()?;
         loop {
-            match read() {
-                Ok(Key(event)) => {
-                    println!("{event:?} \r");
-                    if let Char(c) = event.code {
-                        if c == 'q' {
-                            break;
-                        }
+            if let Key(event) = read()? {
+                println!("{event:?} \r");
+                if let Char(c) = event.code {
+                    if c == 'q' {
+                        break;
                     }
-                },
-                Err(err) => println!("Error: {err}"),
-                _ => ()
+                }
             }
         }
-        disable_raw_mode().unwrap(); 
+        disable_raw_mode()?;
+        Ok(()) 
     }
 }
 
@@ -35,6 +41,9 @@ impl Editor {
 
 // 更专注于crossterm
 
-// 使用 clippy 进行代码检测
+// 使用 clippy 进行代码检测 cargo clippy -- -W clippy::all  -W clippy::pedantic
 // 调整了格式化
 // 使用 if let 简化
+
+// 错误向上传递
+// 使用?传递
