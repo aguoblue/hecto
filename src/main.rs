@@ -9,3 +9,5 @@ fn main() {
 
 //change
 // 代码拆分
+
+// Editor::default() 匿名变量，编译器可变借用
